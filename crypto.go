@@ -1,4 +1,4 @@
-package library
+package mu
 
 import (
 	"crypto/aes"
