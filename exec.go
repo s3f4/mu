@@ -1,20 +1,17 @@
 package mu
 
 import (
-	"os"
 	"os/exec"
 )
 
 // RunCommands runs multiple commands
-func RunCommands(command string) error {
-	executable := exec.Command("/bin/sh", "-c", command)
-	executable.Stdout = os.Stdout
-	executable.Stderr = os.Stderr
-
-	if err := executable.Start(); err != nil {
-		return err
+func RunCommands(command string) ([]byte, error) {
+	cmd := exec.Command("/bin/sh", "-c", command)
+	output, err := cmd.CombinedOutput()
+	
+	if err != nil {
+		return nil, err
 	}
 
-	executable.Wait()
-	return nil
+	return output, nil
 }
