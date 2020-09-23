@@ -7,9 +7,9 @@ import (
 
 // Response is used to create an http response
 type Response struct {
-	Status  bool                   `json:"status"`
-	Message string                 `json:"message,omitempty"`
-	Data    map[string]interface{} `json:"data,omitempty"`
+	Status  bool        `json:"status"`
+	Message string      `json:"message,omitempty"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
 //SendResponse returns json response
@@ -31,10 +31,10 @@ func SendResponse(w http.ResponseWriter, statusCode int, message interface{}) {
 func dataOrMessage(message interface{}) *Response {
 	r := &Response{}
 	switch message.(type) {
-	case string:
-		r.Message = message.(string)
-	case map[string]interface{}:
-		r.Data = message.(map[string]interface{})
+	case error:
+		r.Message = message.(error).Error()
+	default:
+		r.Data = message
 	}
 	return r
 }

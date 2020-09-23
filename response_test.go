@@ -2,11 +2,14 @@ package mu
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,7 +39,7 @@ func TestR200(t *testing.T) {
 
 	assert.Nil(t, err, "response json unmarshal error")
 	assert.Equal(t, respBody.Status, true, "Statuses are not equal")
-	assert.Equal(t, "hello", respBody.Message)
+	assert.Equal(t, "hello", respBody.Data)
 }
 
 func TestR200WithData(t *testing.T) {
@@ -52,7 +55,8 @@ func TestR200WithData(t *testing.T) {
 
 	var respBody Response
 	err := json.Unmarshal(body, &respBody)
-
+	fmt.Println(respBody)
+	fmt.Println(string(body))
 	assert.Nil(t, err, "response json unmarshal error")
 	assert.Equal(t, respBody.Status, true, "Statuses are not equal")
 	assert.Equal(t, map[string]interface{}{
@@ -61,12 +65,43 @@ func TestR200WithData(t *testing.T) {
 	}, respBody.Data)
 }
 
-func TestR400(t *testing.T) {
+func TestR200WithStruct(t *testing.T) {
+	type request struct {
+		A string
+		B bool
+		C int64
+	}
+
+	req := request{
+		A: "a",
+		B: false,
+		C: 55,
+	}
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R400(w, "hello")
+		R200(w, req)
 	}
 
 	res, body := sendReq(handler)
+	fmt.Println(string(body))
+	assert.Equal(t, res.StatusCode, http.StatusOK, "%d status is not equal to %d", res.StatusCode, http.StatusOK)
+
+	var respBody Response
+	err := json.Unmarshal(body, &respBody)
+	assert.Nil(t, err, "response json unmarshal error")
+	assert.Equal(t, respBody.Status, true, "Statuses are not equal")
+	var newReq request
+	mapstructure.Decode(respBody.Data, &newReq)
+	assert.Equal(t, req, newReq)
+}
+
+func TestR400(t *testing.T) {
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		R400(w, errors.New("hello"))
+	}
+
+	res, body := sendReq(handler)
+	fmt.Println(string(body))
 	assert.Equalf(t, res.StatusCode, http.StatusBadRequest, "StatusCode: %d is not equal to %d", res.StatusCode, http.StatusBadRequest)
 
 	var respBody Response
@@ -79,7 +114,7 @@ func TestR400(t *testing.T) {
 
 func TestR401(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R401(w, "hello")
+		R401(w, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
@@ -96,7 +131,7 @@ func TestR401(t *testing.T) {
 //R403 returns Status forbidden
 func TestR403(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R403(w, "hello")
+		R403(w, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
@@ -113,7 +148,7 @@ func TestR403(t *testing.T) {
 //R404 returns Status not found
 func TestR404(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R404(w, "hello")
+		R404(w, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
@@ -130,7 +165,7 @@ func TestR404(t *testing.T) {
 //R422 returns Status unprocessable entity
 func TestR422(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R422(w, "hello")
+		R422(w, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
@@ -147,7 +182,7 @@ func TestR422(t *testing.T) {
 //R500 returns Status internal server error
 func TestR500(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R500(w, "hello")
+		R500(w, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
