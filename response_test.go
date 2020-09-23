@@ -3,7 +3,6 @@ package mu
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -55,8 +54,6 @@ func TestR200WithData(t *testing.T) {
 
 	var respBody Response
 	err := json.Unmarshal(body, &respBody)
-	fmt.Println(respBody)
-	fmt.Println(string(body))
 	assert.Nil(t, err, "response json unmarshal error")
 	assert.Equal(t, respBody.Status, true, "Statuses are not equal")
 	assert.Equal(t, map[string]interface{}{
@@ -83,7 +80,6 @@ func TestR200WithStruct(t *testing.T) {
 	}
 
 	res, body := sendReq(handler)
-	fmt.Println(string(body))
 	assert.Equal(t, res.StatusCode, http.StatusOK, "%d status is not equal to %d", res.StatusCode, http.StatusOK)
 
 	var respBody Response
@@ -101,7 +97,6 @@ func TestR400(t *testing.T) {
 	}
 
 	res, body := sendReq(handler)
-	fmt.Println(string(body))
 	assert.Equalf(t, res.StatusCode, http.StatusBadRequest, "StatusCode: %d is not equal to %d", res.StatusCode, http.StatusBadRequest)
 
 	var respBody Response
