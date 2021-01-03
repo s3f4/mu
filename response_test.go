@@ -27,7 +27,7 @@ func sendReq(handler handlerFunc) (*http.Response, []byte) {
 
 func TestR200(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R200(w, "hello")
+		R200(w, r, "hello")
 	}
 
 	res, body := sendReq(handler)
@@ -43,7 +43,7 @@ func TestR200(t *testing.T) {
 
 func TestR200WithData(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R200(w, map[string]interface{}{
+		R200(w, r, map[string]interface{}{
 			"a": "a",
 			"b": "b",
 		})
@@ -76,7 +76,7 @@ func TestR200WithStruct(t *testing.T) {
 	}
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R200(w, req)
+		R200(w, r, req)
 	}
 
 	res, body := sendReq(handler)
@@ -93,7 +93,7 @@ func TestR200WithStruct(t *testing.T) {
 
 func TestR400(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R400(w, errors.New("hello"))
+		R400(w, r, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
@@ -109,7 +109,7 @@ func TestR400(t *testing.T) {
 
 func TestR401(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R401(w, errors.New("hello"))
+		R401(w, r, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
@@ -126,7 +126,7 @@ func TestR401(t *testing.T) {
 //R403 returns Status forbidden
 func TestR403(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R403(w, errors.New("hello"))
+		R403(w, r, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
@@ -143,7 +143,7 @@ func TestR403(t *testing.T) {
 //R404 returns Status not found
 func TestR404(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R404(w, errors.New("hello"))
+		R404(w, r, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
@@ -160,7 +160,7 @@ func TestR404(t *testing.T) {
 //R422 returns Status unprocessable entity
 func TestR422(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R422(w, errors.New("hello"))
+		R422(w, r, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
@@ -177,7 +177,7 @@ func TestR422(t *testing.T) {
 //R500 returns Status internal server error
 func TestR500(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		R500(w, errors.New("hello"))
+		R500(w, r, errors.New("hello"))
 	}
 
 	res, body := sendReq(handler)
