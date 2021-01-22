@@ -3,7 +3,6 @@ package log
 import (
 	"os"
 
-	"github.com/s3f4/mu"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -56,7 +55,8 @@ func BuildLogger(env string) {
 
 // SetOutputPaths creates log directory
 func setOutputPaths() []string {
-	if !mu.DirExists("log") {
+	stat, err := os.Stat("log")
+	if !(!os.IsNotExist(err) && stat.IsDir()) {
 		err := os.Mkdir("log", 0755)
 		if err != nil {
 			panic(err)
