@@ -3,20 +3,22 @@ package log
 import (
 	"os"
 
+	"github.com/s3f4/mu"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 var log *zap.SugaredLogger
 var config zap.Config
+var logger *zap.Logger
 
 var (
-	//APP_ENV for config
-	APP_ENV = "APP_ENV"
+	//APPENV for config
+	APPENV = "APP_ENV"
 )
 
 func init() {
-	BuildLogger(os.Getenv(APP_ENV))
+	BuildLogger(os.Getenv(APPENV))
 }
 
 // BuildLogger builds log config
@@ -45,18 +47,23 @@ func BuildLogger(env string) {
 		ErrorOutputPaths: []string{"stderr"},
 	}
 
-	logger, err := config.Build()
+	l, err := config.Build(zap.AddCallerSkip(1))
 	if err != nil {
 		panic(err)
 	}
 
-	log = logger.Sugar()
+	logger = l
+	log = l.Sugar()
+}
+
+// GetLogger returns zap.logger object
+func GetLogger() *zap.Logger {
+	return logger
 }
 
 // SetOutputPaths creates log directory
 func setOutputPaths() []string {
-	stat, err := os.Stat("log")
-	if !(!os.IsNotExist(err) && stat.IsDir()) {
+	if !mu.DirExists("log") {
 		err := os.Mkdir("log", 0755)
 		if err != nil {
 			panic(err)
